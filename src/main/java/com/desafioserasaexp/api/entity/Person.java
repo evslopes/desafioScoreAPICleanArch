@@ -6,12 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.xml.transform.Source;
+
 @Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Person {
+public class Person implements Source {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -16,4 +16,8 @@ public interface PersonRepository {
     Page<Person> findAll(Pageable pageable, String name, Integer age, String cep);
 
     void deleteById(Long id);
+
+    boolean existsByNameAndPhone(String name, String phone);
+
+    Page<Person> findPaginated(Pageable pageable, String name, Integer age, String cep);
 }
