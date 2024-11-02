@@ -10,6 +10,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
+import javax.xml.transform.Source;
 import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.util.Set;
@@ -39,7 +40,7 @@ public class CreatePersonUseCase {
 
     private void validatePerson(Person person) throws IOException, SAXException {
         Set<ConstraintViolation<Person>> violations = Set.of();
-        validator.validate(person);
+        validator.validate((Source) person);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
         }
