@@ -13,6 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/persons")
@@ -33,7 +36,13 @@ public class PersonController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new person", security = @SecurityRequirement(name = "bearerAuth"))
     public Person create(@RequestBody Person person) throws PersonAlreadyExistsException {
-        return createPersonUseCase.execute(person);
+        try {
+            return createPersonUseCase.execute(person);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (SAXException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @GetMapping

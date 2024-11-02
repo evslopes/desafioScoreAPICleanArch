@@ -13,7 +13,7 @@ import javax.xml.transform.Source;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Person implements Source {
+public class Person {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
