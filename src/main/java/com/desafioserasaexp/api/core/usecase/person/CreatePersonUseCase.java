@@ -13,8 +13,7 @@ import javax.xml.validation.Validator;
 import java.util.Set;
 
 @Component
-public class
-CreatePersonUseCase {
+public class CreatePersonUseCase {
 
     private final PersonRepository personRepository;
     private final AddressServiceImpl addressService;
@@ -29,27 +28,33 @@ CreatePersonUseCase {
     }
 
     public Person execute(Person person) throws PersonAlreadyExistsException {
-        // Validação dos dados da pessoa
+        validatePerson(person);
+        checkIfPersonExists(person);
+        setAddress(person);
+        calculateScoreDescription(person);
+        return personRepository.save(person);
+    }
+
+    private void validatePerson(Person person) {
         Set<ConstraintViolation<Person>> violations = validator.validate(person);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
-
         }
+    }
 
-        // Verifica se já existe uma pessoa com o mesmo nome e telefone
+    private void checkIfPersonExists(Person person) throws PersonAlreadyExistsException {
         if (personRepository.existsByNameAndPhone(person.getName(), person.getPhone())) {
             throw new PersonAlreadyExistsException("Já existe uma pessoa cadastrada com esse nome e telefone.");
         }
+    }
 
-        // Consulta da API externa de endereço
+    private void setAddress(Person person) {
         var address = addressService.getAddressByCep(person.getAddress().getCep());
         person.setAddress(address);
+    }
 
-        // Cálculo do scoreDescription
+    private void calculateScoreDescription(Person person) {
         String scoreDescription = personService.calculateScoreDescription(person);
         person.setScoreDescription(scoreDescription);
-
-        // Persistência da pessoa
-        return personRepository.save(person);
     }
 }
