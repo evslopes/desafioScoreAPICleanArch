@@ -8,8 +8,10 @@ import com.desafioserasaexp.api.entity.Person;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.stereotype.Component;
+import org.xml.sax.SAXException;
 
 import javax.xml.validation.Validator;
+import java.io.IOException;
 import java.util.Set;
 
 @Component
@@ -27,7 +29,7 @@ public class CreatePersonUseCase {
         this.validator = validator;
     }
 
-    public Person execute(Person person) throws PersonAlreadyExistsException {
+    public Person execute(Person person) throws PersonAlreadyExistsException, IOException, SAXException {
         validatePerson(person);
         checkIfPersonExists(person);
         setAddress(person);
@@ -35,8 +37,9 @@ public class CreatePersonUseCase {
         return personRepository.save(person);
     }
 
-    private void validatePerson(Person person) {
-        Set<ConstraintViolation<Person>> violations = validator.validate(person);
+    private void validatePerson(Person person) throws IOException, SAXException {
+        Set<ConstraintViolation<Person>> violations = Set.of();
+        validator.validate(person);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
         }

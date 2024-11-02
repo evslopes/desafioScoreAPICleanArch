@@ -1,9 +1,12 @@
 package com.desafioserasaexp.api.entrypoint.controller;
 
+import com.desafioserasaexp.api.core.exception.PersonAlreadyExistsException;
+import com.desafioserasaexp.api.core.usecase.person.CreatePersonUseCase;
+import com.desafioserasaexp.api.core.usecase.person.UpdatePersonUseCase;
+import com.desafioserasaexp.api.core.usecase.person.DeletePersonUseCase;
 import com.desafioserasaexp.api.entity.Person;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,14 +19,21 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Person", description = "Operations about persons")
 public class PersonController {
 
-    // TODO Injeção dos casos de uso
+    private final CreatePersonUseCase createPersonUseCase;
+    private final UpdatePersonUseCase updatePersonUseCase;
+    private final DeletePersonUseCase deletePersonUseCase;
+
+    public PersonController(CreatePersonUseCase createPersonUseCase, UpdatePersonUseCase updatePersonUseCase, DeletePersonUseCase deletePersonUseCase) {
+        this.createPersonUseCase = createPersonUseCase;
+        this.updatePersonUseCase = updatePersonUseCase;
+        this.deletePersonUseCase = deletePersonUseCase;
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new person", security = @SecurityRequirement(name = "bearerAuth"))
-    public Person create(@RequestBody Person person) {
-        // TODO Chamada do caso de uso para criar pessoa
-        return null;
+    public Person create(@RequestBody Person person) throws PersonAlreadyExistsException {
+        return createPersonUseCase.execute(person);
     }
 
     @GetMapping
@@ -39,14 +49,14 @@ public class PersonController {
     @PutMapping("/{id}")
     @Operation(summary = "Update a person", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Person> update(@PathVariable Long id, @RequestBody Person person) {
-        // TODO Chamada do caso de uso para atualizar pessoa
-        return null;
+        Person updatedPerson = updatePersonUseCase.execute(id, person);
+        return ResponseEntity.ok(updatedPerson);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a person", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        // TODO Chamada do caso de uso para deletar pessoa
-        return null;
+        deletePersonUseCase.execute(id);
+        return ResponseEntity.noContent().build();
     }
 }
